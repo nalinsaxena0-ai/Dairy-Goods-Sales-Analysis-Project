@@ -52,3 +52,12 @@ Develop SQL-based analytics to deliver detailed insights into:
 
 ---
 
+## 🛡️ License
+
+This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and share this project with proper attribution.
+
+---
+
+## 🌟 About Me
+
+Hi there, I am Nalin Saxena a fresher, graduated from Shyam Lal College with a degree in B.A. Economics.
