@@ -9,23 +9,16 @@ Script Purpose:
 ===============================================================================
 */
 
-IF OBJECT_ID('bronze.land_info', 'U') IS NOT NULL
-	DROP TABLE bronze.land_info;
+IF OBJECT_ID('bronze.dairy_info', 'U') IS NOT NULL
+	DROP TABLE bronze.dairy_info;
 GO
 
-CREATE TABLE bronze.land_info (
+CREATE TABLE bronze.dairy_info (
 Location			NVARCHAR(50),
 total_land_area		INT,
 number_of_cows		INT,
 farm_size			NVARCHAR(50),
-date				DATE
-);
-GO
-
-IF OBJECT_ID('bronze.prd_info', 'U') IS NOT NULL
-	DROP TABLE bronze.prd_info;
-
-CREATE TABLE bronze.prd_info (
+date				DATE,
 product_id			INT,
 product_name		NVARCHAR(50),
 brand				NVARCHAR(50),
@@ -46,3 +39,5 @@ min_stk_threshold	INT,
 reorder_quantity	INT
 );
 GO
+
+
