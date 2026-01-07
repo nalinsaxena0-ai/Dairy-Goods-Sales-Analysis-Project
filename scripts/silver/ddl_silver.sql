@@ -29,7 +29,8 @@ IF OBJECT_ID ('silver.products', 'U') IS NOT NULL
 GO
 
 CREATE TABLE silver.products (
-    product_id          INT PRIMARY KEY,
+    product_key         INT IDENTITY(1,1) PRIMARY KEY,
+    product_id          INT,
     product_name        NVARCHAR(100),
     brand               NVARCHAR(100),
     shelf_life          INT,                -- days
@@ -45,7 +46,7 @@ GO
 
 CREATE TABLE silver.sales (
     sale_id                 INT IDENTITY(1,1) PRIMARY KEY,
-    product_id              INT,
+    product_key             INT,
 
     quantity_value          FLOAT,
     quantity_unit           NVARCHAR(20),
@@ -65,7 +66,7 @@ CREATE TABLE silver.sales (
     customer_location       NVARCHAR(100),
     sales_channel           NVARCHAR(50),
 
-    FOREIGN KEY (product_id) REFERENCES silver.products(product_id)
+    FOREIGN KEY (product_key) REFERENCES silver.products(product_key)
 );
 GO
 
@@ -74,7 +75,7 @@ IF OBJECT_ID ('silver.inventory', 'U') IS NOT NULL
 GO
 
 CREATE TABLE silver.inventory (
-    product_id              INT PRIMARY KEY,
+    product_key             INT PRIMARY KEY,
 
     stock_value             FLOAT,
     stock_unit              NVARCHAR(20),
@@ -85,6 +86,6 @@ CREATE TABLE silver.inventory (
     reorder_quantity_value  FLOAT,
     reorder_quantity_unit   NVARCHAR(20),
 
-    FOREIGN KEY (product_id) REFERENCES silver.products(product_id)
+    FOREIGN KEY (product_key) REFERENCES silver.products(product_key)
 );
 GO
