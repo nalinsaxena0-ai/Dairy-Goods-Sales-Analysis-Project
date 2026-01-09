@@ -71,7 +71,7 @@ WITH DateRange AS (
 ),
 Tally AS (
     SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1 AS n
-    FROM master..spt_values  -- provides ~2000 rows
+    FROM master..spt_values  
 )
 
 SELECT
@@ -96,3 +96,45 @@ FROM DateRange
 CROSS JOIN Tally
 WHERE DATEADD(DAY, n, start_date) <= end_date;
 GO
+
+-- Creating VIEW gold.fact_sales_daily
+
+IF OBJECT_ID ('gold.fact_sales_daily', 'V') IS NOT NULL
+    DROP VIEW gold.fact_sales_daily;
+GO
+
+CREATE VIEW gold.fact_sales_daily AS
+SELECT
+d.date_key,
+p.product_key,
+l.location_key,
+sc.sales_channel_key,
+SUM(quantity_sold_value) AS total_quantity_sold,
+ROUND(SUM(revenue), 2) AS total_revenue,
+ROUND(SUM(total_value), 2) AS total_value,
+ROUND(AVG(selling_price), 2) AS avg_selling_price,
+ROUND(AVG(price_per_unit), 2) AS avg_price_per_unit,
+ROUND(SUM(revenue) * 1.0 / NULLIF(SUM(quantity_sold_value), 0), 2) AS revenue_per_unit,
+CASE
+    WHEN SUM(revenue) < 1000 THEN 'Low'
+    WHEN SUM(revenue) < 5000 THEN 'Medium'
+    ELSE 'High'
+END AS revenue_category,
+
+CASE
+    WHEN SUM(quantity_sold_value) < 50 THEN 'Low Volume'
+    WHEN SUM(quantity_sold_value) < 200 THEN 'Medium Volume'
+    ELSE 'High Volume'
+END AS quantity_category
+FROM silver.sales s
+INNER JOIN silver.products p
+ON s.product_key = p.product_key
+INNER JOIN gold.dim_dates d
+ON p.production_date = d.full_date
+INNER JOIN gold.dim_customer_location l
+ON s.customer_location = l.customer_location
+INNER JOIN gold.dim_sales_channel sc
+ON s.sales_channel = sc.sales_channel
+GROUP BY d.date_key, p.product_key, l.location_key, sc.sales_channel_key;
+GO
+
