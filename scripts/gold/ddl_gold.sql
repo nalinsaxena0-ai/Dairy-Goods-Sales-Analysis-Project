@@ -138,3 +138,34 @@ ON s.sales_channel = sc.sales_channel
 GROUP BY d.date_key, p.product_key, l.location_key, sc.sales_channel_key;
 GO
 
+-- Creating VIEW gold.fact_inventory_snapshot
+
+IF OBJECT_ID('gold.fact_inventory_snapshot', 'V') IS NOT NULL
+    DROP VIEW gold.fact_inventory_snapshot;
+GO
+
+CREATE VIEW gold.fact_inventory_snapshot AS
+SELECT
+d.date_key,
+i.product_key,
+i.stock_value,
+i.min_stock_value,
+i.reorder_quantity_value,
+CASE 
+     WHEN i.stock_value <= i.min_stock_value THEN 1 
+     ELSE 0 
+END AS needs_reorder,
+CASE
+    WHEN i.stock_value = 0 THEN 'Out of Stock'
+    WHEN i.stock_value < i.min_stock_value THEN 'Low Stock'
+    ELSE 'Healthy Stock'
+END AS stock_status,
+
+(i.min_stock_value - i.stock_value) AS reorder_gap
+FROM silver.inventory i
+CROSS JOIN (
+	SELECT date_key, full_date
+	FROM gold.dim_dates
+	WHERE full_date = (SELECT MAX(full_date) FROM gold.dim_dates)
+) d;
+GO
